@@ -73,12 +73,15 @@ and lives in chalkboard-core, not here (CLAUDE.md, Repo class).
 
 ## Current state
 
-*Written 2026-11-03, at the repo's first commit.*
+*Written 2026-11-03, at the repo's first commit; updated 2026-11-03
+when the GitHub remote was added.*
 
 **Repo.** Set up per the `study-*` class, modeled on
 `study-santafe-nonprofits`: `scripts/`, gitignored `data/`, `output/`,
 `scratch/`, and `docs/` (this page, `data.md`, `FINDINGS.md`,
-`backlog.md`). No remote; the user creates the GitHub repo and pushes.
+`backlog.md`). GitHub remote `km3uandrew/study-santafe-succession`
+(`origin`); the first commit, `624be92`, is pushed, so
+`gitpushall` now includes this repo.
 
 **Scripts.** `00_setup.R` holds the study parameters and the Census
 query helper (`f_census_query()`), which caches each raw response in
@@ -117,4 +120,4 @@ cache.
 - **Code:** compute the owner-age shares (decisions 2, 3, 6) and the
   firm-age shares (decisions 1, 4, 5) once the proxy question is
   settled, since it determines what the firm-age figure is a share of.
-- **Kary:** write the Intent section; create the GitHub repo and push.
+- **Kary:** write the Intent section.
