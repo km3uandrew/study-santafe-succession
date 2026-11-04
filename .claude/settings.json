@@ -1,0 +1,23 @@
+{
+  "_comment": "Study-class policy: these rules protect the tooling boundary (CLAUDE.md), not data sensitivity. Reusable data access and wrangling belongs in chalkboard.eda; study sessions consume the package and never write to it — hence the checkout is readable via additionalDirectories but denied for edit/write. The client-template rules grounded in client-data sensitivity (Read denials on data/, output/, scratch/, and the Rscript ask gate) do not carry over: this repo holds public data. Pushing is denied outright, not prompted: agent sessions commit locally and flag the pending push (study-* class rule). These rules bind agent sessions only — they have no effect on the user's own terminal. Per-machine overrides go in .claude/settings.local.json (gitignored).",
+  "permissions": {
+    "allow": [
+      "Read(scripts/**)",
+      "Edit(scripts/**)",
+      "Write(scripts/**)",
+      "Edit(scratch/**)",
+      "Write(scratch/**)",
+      "Bash(git add *)",
+      "Bash(git commit *)"
+    ],
+    "deny": [
+      "Bash(git push)",
+      "Bash(git push *)",
+      "Edit(../chalkboard.eda/**)",
+      "Write(../chalkboard.eda/**)"
+    ],
+    "additionalDirectories": [
+      "../chalkboard.eda"
+    ]
+  }
+}

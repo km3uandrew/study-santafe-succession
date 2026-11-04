@@ -1,0 +1,34 @@
+# R session artifacts
+.Rproj.user
+.Rhistory
+.RData
+.httr-oauth
+.quarto
+.DS_Store
+
+# Claude Code local settings (skills are tracked; settings are per-machine)
+.claude/settings.local.json
+
+# Raw pulls and rendered artifacts are excluded for reproducibility, not
+# protection: this is a study repo (public data in, publishable analysis
+# out). data/ holds re-downloadable Census API responses, output/ holds
+# rendered plots, scratch/ is ephemeral working space (including
+# scratch/logs/, the run logs). The reproducible artifact is the download
+# script, not the download — see docs/data.md. Plain directories, not
+# Proton Drive symlinks.
+#
+# /data/* rather than /data/ so the fetch log can be re-included below:
+# git will not re-include a file whose parent directory is excluded, so a
+# negation under a bare /data would fail silently. Do not "simplify" the
+# trailing /* away. The nested pair does the same job one level deeper,
+# for the Census response cache.
+/data/*
+!/data/census_cache/
+/data/census_cache/*
+!/data/census_cache/_fetch_log.ndjson
+/output
+/scratch
+
+# The API key never enters this repo: it is read from ~/.Renviron. A
+# project-level .Renviron is ignored in case one is ever created here.
+.Renviron
