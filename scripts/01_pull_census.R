@@ -4,8 +4,9 @@
 #            It fills data/census_cache/ and prints what came back.
 # Started:   2026-11-03 (promoted from the feasibility session's pull.R)
 #
-# Data years: owner age ABS 2023 (headline) and 2022 (consistency check,
-# never pooled); NES-D 2023; firm age BDS 2022. All industries combined:
+# Data years: owner age ABS reference year 2023 (headline; Census's "2024
+# ABS") and reference year 2022 (consistency check, never pooled; the
+# "2023 ABS"); NES-D 2023; firm age BDS 2022. All industries combined:
 # county and metro owner age is published for all industries only.
 #
 # Re-running is offline once the cache is full: f_census_query() reads
@@ -68,8 +69,8 @@ bds <- f_census_query_geos(
 # ── What came back ────────────────────────────────────────────────────────────
 cat("\nRows returned, by table and geography:\n")
 bind_rows(
-  abs_headline |> count(table = paste0("ABS ", abs_year_headline, " ", QDESC), geo),
-  abs_check    |> count(table = paste0("ABS ", abs_year_check, " O09"), geo),
+  abs_headline |> count(table = paste0("ABS ref ", abs_year_headline, " ", QDESC), geo),
+  abs_check    |> count(table = paste0("ABS ref ", abs_year_check, " O09"), geo),
   nesd         |> count(table = paste0("NES-D ", nesd_year, " O09"), geo),
   bds          |> count(table = paste0("BDS ", bds_year), geo)
 ) |>
@@ -85,7 +86,7 @@ flagged <- function(df) {
     nrow()
 }
 tibble(
-  table   = c(paste("ABS", abs_year_headline), paste("ABS", abs_year_check),
+  table   = c(paste("ABS ref", abs_year_headline), paste("ABS ref", abs_year_check),
               paste("NES-D", nesd_year), paste("BDS", bds_year)),
   flagged = c(flagged(abs_headline), flagged(abs_check), flagged(nesd), flagged(bds)),
   rows    = c(nrow(abs_headline), nrow(abs_check), nrow(nesd), nrow(bds))

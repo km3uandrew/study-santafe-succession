@@ -47,7 +47,15 @@ and lives in chalkboard-core, not here (CLAUDE.md, Repo class).
 6. **ABS 2023 is the headline year;** ABS 2022 is a consistency check,
    never pooled.
 
-## Prior art (from the 2026-11-03 handoff)
+*Reading the ABS years in decisions 4 and 6 (note added 2026-11-03; the
+decisions themselves are unchanged):* both years are ABS **reference
+years**, and they match the API path the study pulls. Census names these
+releases one year later: reference year 2023 is the "2024 ABS", and
+reference year 2022 is the "2023 ABS" (`docs/data.md`, ABS releases and
+reference years). Decision 6's reporting treatment is under review in
+Chat; see `docs/backlog.md`.
+
+## Prior art (from the 2026-11-03 handoffs)
 
 - **Owner age, employer firms:** Census ABS, Characteristics of
   Business Owners (`2023/abscbo`), OWNRAGE — adopted.
@@ -70,11 +78,20 @@ and lives in chalkboard-core, not here (CLAUDE.md, Repo class).
   found (search covered Project Equity's published methodology and
   Census BDS documentation). **Status after 2026-11-03: not
   implementable at the county or metro** — see Current state.
+- **Firm age and firm size, county level, second candidate:** Census
+  Quarterly Workforce Indicators (QWI), LEHD program
+  (`timeseries/qwi`). Introduced as a candidate source, checked, and
+  ruled out: firm age and size are not crossed, and both are measured
+  at the national-firm level (`docs/FINDINGS.md`, 2026-11-03).
+- **ABS sample design and reference years:** Census ABS methodology
+  documentation for each release. Adopted as the authority on both
+  (`docs/data.md`, ABS releases and reference years).
 
 ## Current state
 
 *Written 2026-11-03, at the repo's first commit; updated 2026-11-03
-when the GitHub remote was added.*
+when the GitHub remote was added, and again for the QWI check and the
+ABS release review.*
 
 **Repo.** Set up per the `study-*` class, modeled on
 `study-santafe-nonprofits`: `scripts/`, gitignored `data/`, `output/`,
@@ -86,8 +103,9 @@ when the GitHub remote was added.*
 **Scripts.** `00_setup.R` holds the study parameters and the Census
 query helper (`f_census_query()`), which caches each raw response in
 `data/census_cache/` and appends a record to the committed fetch log.
-`01_pull_census.R` pulls ABS 2023 (owner age plus two further owner
-questions), ABS 2022 (owner age), NES-D 2023 (owner age), and BDS 2022
+`01_pull_census.R` pulls ABS reference year 2023 (owner age plus two
+further owner questions), ABS reference year 2022 (owner age), NES-D
+2023 (owner age), and BDS 2022
 (firm age, by sector) at county, metro, New Mexico, and U.S.; it prints
 row counts, suppression counts, and two integrity checks.
 `05_import_feasibility_cache.R` is a committed one-shot that imported
@@ -107,6 +125,23 @@ applied to the local firm-age figures. Per the handoff, the work
 stopped there; nothing downstream of the firm-size question was
 computed.
 
+**QWI as an alternative: ruled out.** The Quarterly Workforce
+Indicators publish firm age and firm size only separately, and measure
+both at the national-firm level. The documentation says so, and a
+county request for one crossed cell returns nothing while the same
+request by firm age alone returns data. Recorded in `docs/FINDINGS.md`.
+
+**ABS reference-year 2022 vs. 2023 at the county.** The years in the
+docs and scripts are reference years. That was right but unstated,
+and is now explicit everywhere. One claim was wrong and is
+corrected: county owner age also exists for reference year 2017. The
+methodology review is in `docs/data.md`. The 2023 release's sample is
+about 39% the size of the 2022 release's (about 330,000 vs. 850,000
+employer businesses), and neither is stratified by county. That
+explains the larger 2023 county standard errors. Nothing documented
+explains the drop in the 65+ share. The reporting decision is open in
+`docs/backlog.md`.
+
 **Not yet computed:** the headline owner-age shares, their intervals,
 and the firm-age employment shares. The data for all of them is in the
 cache.
@@ -114,9 +149,12 @@ cache.
 ## Next
 
 - **Chat:** the "locally owned" proxy has no implementable form in
-  BDS at the local level. Whether to drop it, report firm age for all
-  firms with the chain limitation stated, or look for another source is
-  open — see `docs/backlog.md`, Chat-first.
+  BDS or QWI at the local level. Whether to drop it, report firm age
+  for all firms with the chain limitation stated, or look for another
+  source is open — see `docs/backlog.md`, Chat-first.
+- **Chat:** how to report ABS reference year 2023 against the 2022
+  check, now with the methodology evidence in `docs/data.md` — see
+  `docs/backlog.md`, Chat-first.
 - **Code:** compute the owner-age shares (decisions 2, 3, 6) and the
   firm-age shares (decisions 1, 4, 5) once the proxy question is
   settled, since it determines what the firm-age figure is a share of.

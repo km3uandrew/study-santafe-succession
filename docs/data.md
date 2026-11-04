@@ -9,18 +9,104 @@ the download. This file records what the scripts expect, where it came
 from, when it was retrieved, and how the API behaves.
 
 Every output states its data year: **owner age 2023** (ABS 2022 is a
-consistency check only), **firm age 2022**.
+consistency check only), **firm age 2022**. For the ABS these are
+**reference years** — the year the data describe — not the survey
+names Census gave those releases (see ABS releases and reference years,
+below).
 
 ## Sources
 
 | Table | Endpoint | Year(s) | What it gives this study |
 | --- | --- | --- | --- |
-| Annual Business Survey (ABS), Characteristics of Business Owners | `2023/abscbo`, `2022/abscbo` | 2023 headline; 2022 check | Owner age (question O09, OWNRAGE) for owners of **employer** firms, with standard errors |
+| Annual Business Survey (ABS), Characteristics of Business Owners | `2023/abscbo`, `2022/abscbo` | Reference year 2023 headline (Census's "2024 ABS"); reference year 2022 check (the "2023 ABS") | Owner age (question O09, OWNRAGE) for owners of **employer** firms, with standard errors |
 | Nonemployer Statistics by Demographics (NES-D) | `2023/absnesdo` | 2023 | Owner age (O09) for owners of **nonemployer** firms; counts rounded, no standard errors |
 | Business Dynamics Statistics (BDS) | `timeseries/bds` | 2022 (latest the API returns) | Firms, establishments, and employment by firm age; by sector at the metro; by firm size (not crossed with age) |
 
-ABS county coverage begins with 2022. County owner age, from both ABS
-and NES-D, is published for all industries combined only.
+ABS county owner age exists for reference years 2017, 2022, and 2023
+(the 2018, 2023, and 2024 ABS). Reference years 2018–2021 have no
+county estimates (the 2019–2022 ABS published nation, states, and metro
+areas only). Until 2026-11-03 this file said "ABS county coverage begins
+with 2022"; a probe of `2017/abscbo` that day showed otherwise. County
+owner age, from both ABS and NES-D, is published for all industries
+combined only.
+
+## ABS releases and reference years
+
+Census names each ABS release by the year it was **collected**, one year
+after the year its data describe: the 2023 ABS covers reference year
+2022, and the 2024 ABS covers reference year 2023. The data API's path
+year is the **reference year**: `2022/abscbo` is the 2023 ABS and
+`2023/abscbo` is the 2024 ABS. Census's API page pairs them this way;
+both cached responses carry a `YEAR` column equal to the path year.
+From the release fielded in 2026, Census will name releases by reference
+year instead, so the "2025 ABS" will cover 2025. Earlier releases keep
+their old names.
+
+**This study labels the ABS by reference year throughout**, in the
+scripts (`abs_year_headline`, `abs_year_check`), the cache filenames,
+and every doc. "ABS 2023" here means reference year 2023 (Census's
+"2024 ABS"). Read a Census page that says "2023 ABS" as reference year
+2022. Before 2026-11-03 the docs used the bare year without saying
+which year it was. The years were right, but a reader could take
+"ABS 2023" for Census's "2023 ABS", which is the other release.
+
+### Methodology for the two county releases
+
+Read 2026-11-03 from Census's ABS methodology pages
+(<https://www.census.gov/programs-surveys/abs/technical-documentation/methodology.2023.html>
+for the 2023 ABS;
+<https://www.census.gov/programs-surveys/abs/technical-documentation/methodology.html>,
+the 2024 section, for the 2024 ABS) and the API page
+(<https://www.census.gov/data/developers/data-sets/abs.html>). The
+fetched text of both methodology pages cut off partway. Items that come
+only from the later, summarized portion are marked *(summary)*.
+
+| | Reference year 2022 (2023 ABS) | Reference year 2023 (2024 ABS) |
+| --- | --- | --- |
+| Employer businesses mailed | about 850,000 | about 330,000 |
+| Stratification | state, race/ethnicity, industry (not county) | same |
+| Race/ethnicity strata | 8, including "Women" and "Publicly owned" | 7; non-Hispanic White men and women stratified separately |
+| Certainty cases | includes firms selected for the Business Enterprise R&D Survey (BERD); R&D cutoffs as in the 2022 ABS | over 500 employees; BERD firms; stratum payroll/receipt cutoffs; R&D cutoffs changed for some industries |
+| Industry classification | 2022 NAICS | 2022 NAICS |
+| Firms that responded (of non-deaths) | about 61.9% | about 63.3% |
+| Owner tables, sufficient response | about 53.8% *(summary)* | about 54.6% |
+| Firm-count estimates that are imputed | about 12.7% | about 14.4% |
+| Sex, ethnicity, race, veteran status for nonrespondents | assigned from prior ABS, 2010 Census, or ACS; else imputed from donors in the stratum | same |
+| Weighting | reciprocal of selection probability; no nonresponse weighting adjustment | same |
+| Suppression rule stated | relative standard error 50% or more | same |
+| Disclosure avoidance | noise infusion *(summary)* | noise infusion *(summary)* |
+| County estimates published | yes | yes |
+
+What neither page states: the reason for the larger reference-2022
+sample (that year is also an Economic Census year), how county
+estimates are produced or vetted beyond the 50% rule, any sample size
+or response count below the national level, and how **owner age** is
+handled when a respondent skips it. The assignment and imputation
+statements name sex, ethnicity, race, and veteran status only. The
+`EG` "Item not reported" row suggests owner-age nonresponse is
+tabulated rather than imputed. Neither page says so. Both pages say
+published standard errors include an adjustment for imputation, and
+both use 90% (1.6 standard errors) in their worked confidence-interval
+example.
+
+### Published standard errors, owner age 55–64 and 65+
+
+Share of owners of respondent employer firms (`OWNPDEMP_PCT`), with its
+published standard error in percentage points (`OWNPDEMP_PCT_S`), and
+the relative standard error of the owner count (`OWNPDEMP_S`). All
+industries. The metro's figures are identical to the county's.
+
+| Geography | Age | Ref. 2022 share (SE) | Ref. 2023 share (SE) | Ref. 2022 count RSE | Ref. 2023 count RSE |
+| --- | --- | --- | --- | --- | --- |
+| Santa Fe County | 55–64 | 29.6% (1.3) | 30.2% (3.4) | 9.1% | 14.3% |
+| Santa Fe County | 65+ | 39.0% (2.2) | 26.8% (5.3) | 10.7% | 16.6% |
+| New Mexico | 55–64 | 28.9% (1.2) | 28.4% (1.5) | 2.2% | 4.9% |
+| New Mexico | 65+ | 30.9% (1.2) | 26.1% (1.8) | 5.3% | 6.2% |
+| United States | 55–64 | 28.9% (0.2) | 28.2% (0.1) | 0.3% | 0.5% |
+| United States | 65+ | 22.8% (0.5) | 23.1% (0.2) | 0.4% | 0.4% |
+
+County owners reporting age (`EF`): 2,609 in reference year 2022 and
+2,438 in 2023. Both are weighted estimates, not sample counts.
 
 ## Geography
 
@@ -50,9 +136,12 @@ first). A query the API answered with HTTP 204 (no rows) is cached as
 
 | Pattern | Written by | Contents |
 | --- | --- | --- |
-| `abscbo_2023_<geo>_O09.json` | `01_pull_census.R` | ABS 2023 owner age, all industries and (NM, U.S.) sector detail |
-| `abscbo_2023_<geo>_O02.json`, `_O05.json` | `01_pull_census.R` | ABS 2023, two further owner characteristics scoped by the feasibility session; not yet read by any analysis |
-| `abscbo_2022_<geo>_O09.json` | `01_pull_census.R` | ABS 2022 owner age (consistency check) |
+| `abscbo_2023_<geo>_O09.json` | `01_pull_census.R` | ABS reference year 2023 owner age, all industries and (NM, U.S.) sector detail |
+| `abscbo_2023_<geo>_O02.json`, `_O05.json` | `01_pull_census.R` | ABS reference year 2023, two further owner characteristics scoped by the feasibility session; not yet read by any analysis |
+| `abscbo_2022_<geo>_O09.json` | `01_pull_census.R` | ABS reference year 2022 owner age (consistency check) |
+| `abscbo_2017_county_O09_probe.json` | scratch probe, 2026-11-03 | Existence check only: does reference year 2017 publish county owner age? Pulled without the demographic filters, so not a usable table |
+| `qwi_sa_county_firmage5_firmsize1_2024Q4.json` | scratch probe, 2026-11-03 | QWI firm age 11+ × firm size 0–19, county, 2024-Q4: `[]` (not published). See `docs/FINDINGS.md` |
+| `qwi_sa_county_firmage5_2024Q4.json` | scratch probe, 2026-11-03 | Control for the row above: same request with firm age only, which returns a row |
 | `absnesdo_2023_<geo>_O09.json` | `01_pull_census.R` | NES-D 2023 owner age |
 | `bds_2022_<geo>.json` | `01_pull_census.R` | BDS 2022 firm age by sector (sector detail by age at metro, NM, U.S.; county gives the two margins only) |
 | `bds_2022_fage_by_empszfi_<geo>.json` | `10_bds_firm_size_by_age.R` | BDS 2022 firm age and firm size, both wildcarded |
@@ -83,11 +172,14 @@ to identical tables once row order is ignored.
 
 **Retrieval dates as of 2026-11-03:**
 
-- ABS 2023 (O09, O02, O05), NES-D 2023, BDS 2022 by age and sector —
-  2026-11-03, feasibility session (asserted)
-- ABS 2022 (O09) — 2026-11-03, `01_pull_census.R` (observed)
+- ABS reference year 2023 (O09, O02, O05), NES-D 2023, BDS 2022 by age
+  and sector — 2026-11-03, feasibility session (asserted)
+- ABS reference year 2022 (O09) — 2026-11-03, `01_pull_census.R`
+  (observed)
 - BDS 2022 age-by-size probes — 2026-11-03, `10_bds_firm_size_by_age.R`
   (observed)
+- QWI firm-age and firm-size probes, ABS reference year 2017 county
+  probe — 2026-11-03, scratch (observed)
 
 The fetch log is authoritative over this list; refresh the list when a
 pull changes it.

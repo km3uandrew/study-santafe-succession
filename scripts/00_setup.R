@@ -35,8 +35,13 @@ study_name <- "Santa Fe business succession"  # display name for plot titles
 # from the Annual Business Survey (ABS) and Nonemployer Statistics by
 # Demographics (NES-D); firm age from Business Dynamics Statistics (BDS),
 # whose latest returnable year is 2022.
-abs_year_headline <- 2023  # headline owner-age year
-abs_year_check    <- 2022  # consistency check only — never pooled
+#
+# ABS years are REFERENCE years, which is also the API path year. Census
+# names these releases one year later, by collection year: reference year
+# 2023 is the "2024 ABS", reference year 2022 the "2023 ABS"
+# (docs/data.md, ABS releases and reference years).
+abs_year_headline <- 2023  # headline owner-age reference year (the 2024 ABS)
+abs_year_check    <- 2022  # consistency check only, never pooled (the 2023 ABS)
 nesd_year         <- 2023
 bds_year          <- 2022
 
